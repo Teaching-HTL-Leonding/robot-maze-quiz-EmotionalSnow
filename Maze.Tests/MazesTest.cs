@@ -35,6 +35,18 @@ namespace Maze.Tests
             CheckMaze(Mazes.Circle, Mazes.CircleStart, Mazes.CircleEnd, Mazes.CircleSolution);
         }
 
+        [Fact]
+        public void Diversion()
+        {
+            CheckMaze(Mazes.Diversion, Mazes.DiversionStart, Mazes.DiversionEnd, Mazes.DiversionSolution);
+        }
+
+        [Fact]
+        public void Obstacles()
+        {
+            CheckMaze(Mazes.Obstacles, Mazes.ObstaclesStart, Mazes.ObstaclesEnd, Mazes.ObstaclesSolution);
+        }
+
         private void CheckMaze(string mazeString, (int y, int x) start, (int y, int x) end, IEnumerable<Direction> moves)
         {
             var maze = new BitArray(Mazes.MazeFromString(mazeString));

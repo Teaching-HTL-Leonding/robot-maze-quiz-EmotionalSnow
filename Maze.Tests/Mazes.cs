@@ -47,6 +47,31 @@ namespace Maze.Tests
             Direction.Down, Direction.Down
         };
 
+        public const string Diversion = @"          XXXXXXX  XXXXXXX  XXXXXXX  XXXXXXX          XXXX XXXXXXXX XXXXXXXX XXXX";
+        public static readonly (int y, int x) DiversionStart = (0, 0);
+        public static readonly (int y, int x) DiversionEnd = (8, 4);
+        public static readonly IEnumerable<Direction> DiversionSolution = new[]
+        {
+            Direction.Down, Direction.Down, Direction.Down, Direction.Down, Direction.Down,
+            Direction.Right, Direction.Right, Direction.Right, Direction.Right,
+            Direction.Down, Direction.Down, Direction.Down
+        };
+
+        public const string Obstacles = @"          XXXXXXX  X     X          XXXX XXXX          XXXXXXX          XXXX XXXX";
+        public static readonly (int y, int x) ObstaclesStart = (8, 4);
+        public static readonly (int y, int x) ObstaclesEnd = (0, 4);
+        public static readonly IEnumerable<Direction> ObstaclesSolution = new[]
+        {
+            Direction.Up,
+            Direction.Left, Direction.Left, Direction.Left, Direction.Left,
+            Direction.Up, Direction.Up,
+            Direction.Right, Direction.Right, Direction.Right, Direction.Right,
+            Direction.Up, Direction.Up,
+            Direction.Left, Direction.Left, Direction.Left, Direction.Left,
+            Direction.Up, Direction.Up, Direction.Up,
+            Direction.Right, Direction.Right, Direction.Right, Direction.Right
+        };
+
         public const string NoSolution = @" X XXXXXX";
         public static readonly (int y, int x) NoSolutionStart = (0, 0);
         public static readonly (int y, int x) NoSolutionEnd = (0, 2);

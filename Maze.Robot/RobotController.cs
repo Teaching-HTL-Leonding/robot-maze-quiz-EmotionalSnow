@@ -1,4 +1,5 @@
-﻿using Maze.Library;
+﻿using System.Collections.Generic;
+using Maze.Library;
 
 namespace Maze.Solver
 {
@@ -7,7 +8,30 @@ namespace Maze.Solver
     /// </summary>
     public class RobotController
     {
-        private readonly IRobot robot;
+        readonly IRobot robot;
+
+        readonly struct Coordinates
+        {
+            readonly int _x;
+            readonly int _y;
+
+            public Coordinates(int x, int y)
+            {
+                _x = x;
+                _y = y;
+            }
+
+            public Coordinates GetNeighbour(Direction direction)
+            {
+                var directionValue = (int) direction;
+                var x = _x + (directionValue < 2 ? decimal.Compare(0.5m, directionValue) : 0);
+                var y = _y + (directionValue < 2 ? 0 : decimal.Compare(2.5m, directionValue));
+                
+                return new Coordinates(x, y);
+            }
+        }
+
+        readonly Dictionary<Coordinates, bool[]?> map = new Dictionary<Coordinates, bool[]?>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotController"/> class
@@ -31,16 +55,60 @@ namespace Maze.Solver
         /// </remarks>
         public void MoveRobotToExit()
         {
-            // Here you have to add your code
-
-            // Trivial sample algorithm that can just move right
             var reachedEnd = false;
             robot.ReachedExit += (_, __) => reachedEnd = true;
 
-            while (!reachedEnd)
+            bool[] GetPossibleMoveDirections(Coordinates coordinates)
             {
-                robot.Move(Direction.Right);
+                var neighbours = new bool[4];
+                for (int x = 0; x < 4; x++)
+                {
+                    var direction = (Direction) x;
+                    var canMove = robot.CanIMove(direction);
+                    
+                    neighbours[x] = canMove;
+                    
+                    if (canMove)
+                    {
+                        map.TryAdd(coordinates.GetNeighbour(direction), null);
+                    }
+                }
+
+                return neighbours;
             }
+            
+            void MakeNextMove(Coordinates coordinates)
+            {
+                if (reachedEnd) return;
+                
+                static Direction InvertDirection(Direction direction) => (Direction) ((((int) direction + 1) % 2) + (2 * ((int) direction / 2)));
+                
+                var neighbours = GetPossibleMoveDirections(coordinates);
+                map[coordinates] = neighbours;
+
+                for (int x = 0; x < 4; x++)
+                {
+                    if (!neighbours[x]) continue;
+
+                    var direction = (Direction) x;
+                    var neighbour = coordinates.GetNeighbour(direction);
+                    
+                    if (map[neighbour] != null) continue;
+                    
+                    robot.Move(direction);
+                    MakeNextMove(neighbour);
+                    
+                    if (!reachedEnd)
+                    {
+                        robot.Move(InvertDirection(direction));
+                    }
+                    else return;
+                }
+            }
+            
+            MakeNextMove(new Coordinates(0, 0));
+            
+            if (!reachedEnd) robot.HaltAndCatchFire();
         }
     }
 }
