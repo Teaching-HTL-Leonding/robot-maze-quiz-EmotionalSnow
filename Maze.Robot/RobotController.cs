@@ -8,12 +8,10 @@ namespace Maze.Solver
     /// </summary>
     public class RobotController
     {
-        readonly IRobot robot;
-
-        readonly struct Coordinates
+        private readonly struct Coordinates
         {
-            readonly int _x;
-            readonly int _y;
+            private readonly int _x;
+            private readonly int _y;
 
             public Coordinates(int x, int y)
             {
@@ -30,8 +28,9 @@ namespace Maze.Solver
                 return new Coordinates(x, y);
             }
         }
-
-        readonly Dictionary<Coordinates, bool[]?> map = new Dictionary<Coordinates, bool[]?>();
+        
+        private readonly IRobot robot;
+        private readonly Dictionary<Coordinates, bool[]?> map = new Dictionary<Coordinates, bool[]?>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RobotController"/> class
@@ -39,7 +38,6 @@ namespace Maze.Solver
         /// <param name="robot">Robot that is controlled</param>
         public RobotController(IRobot robot)
         {
-            // Store robot for later use
             this.robot = robot;
         }
 
@@ -61,17 +59,14 @@ namespace Maze.Solver
             bool[] GetPossibleMoveDirections(Coordinates coordinates)
             {
                 var neighbours = new bool[4];
-                for (int x = 0; x < 4; x++)
+                for (var x = 0; x < 4; x++)
                 {
                     var direction = (Direction) x;
                     var canMove = robot.CanIMove(direction);
                     
                     neighbours[x] = canMove;
                     
-                    if (canMove)
-                    {
-                        map.TryAdd(coordinates.GetNeighbour(direction), null);
-                    }
+                    if (canMove) map.TryAdd(coordinates.GetNeighbour(direction), null);
                 }
 
                 return neighbours;
@@ -86,7 +81,7 @@ namespace Maze.Solver
                 var neighbours = GetPossibleMoveDirections(coordinates);
                 map[coordinates] = neighbours;
 
-                for (int x = 0; x < 4; x++)
+                for (var x = 0; x < 4; x++)
                 {
                     if (!neighbours[x]) continue;
 
@@ -98,10 +93,7 @@ namespace Maze.Solver
                     robot.Move(direction);
                     MakeNextMove(neighbour);
                     
-                    if (!reachedEnd)
-                    {
-                        robot.Move(InvertDirection(direction));
-                    }
+                    if (!reachedEnd) robot.Move(InvertDirection(direction));
                     else return;
                 }
             }
